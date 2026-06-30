@@ -7,6 +7,9 @@ import { createJob, getJobs, updateJobStatus, deleteJob } from "./services/jobsA
 function App() {
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [deletingJobId, setDeletingJobId] = useState(null);
 
   useEffect(() => {
     async function loadJobs() {
@@ -14,6 +17,8 @@ function App() {
         setJobs(await getJobs());
       } catch (error) {
         setError(error.message);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -22,6 +27,7 @@ function App() {
 
   async function handleCreateJob(job) {
     setError("");
+    setIsSaving(true);
 
     try {
       const newJob = await createJob(job);
@@ -29,21 +35,27 @@ function App() {
     } catch (error) {
       setError(error.message);
       throw error;
+    } finally {
+      setIsSaving(false);
     }
   }
 
   async function handleDeleteJob(jobId) {
-    const confirmed = window.confirm("Are you sure you want to delete this job?");
-    if (!confirmed) {
-      return;
-    }
+    if (!window.confirm("Delete this job?")) return;
+
     setError("");
+    setDeletingJobId(jobId);
+
     try {
       await deleteJob(jobId);
+
       setJobs((currentJobs) =>
-        currentJobs.filter((job) => job.id !== jobId));
+        currentJobs.filter((job) => job.id !== jobId)
+      );
     } catch (error) {
       setError(error.message);
+    } finally {
+      setDeletingJobId(null);
     }
   }
 
@@ -66,19 +78,24 @@ function App() {
     <main>
       <h1>Job Tracker</h1>
 
-      <JobForm onCreateJob={handleCreateJob} />
+      <JobForm onCreateJob={handleCreateJob} isSaving={isSaving} />
       {error && <p className="error-message">{error}</p>}
 
-      <section className="job-list">
-        {jobs.map((job) => (
-          <JobCard
-            key={job.id}
-            job={job}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDeleteJob}
-          />
-        ))}
-      </section>
+      {isLoading ? (
+        <p>Loading jobs...</p>
+      ) : (
+        <section className="job-list">
+          {jobs.map((job) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onStatusChange={handleStatusChange}
+              onDelete={handleDeleteJob}
+              isDeleting={deletingJobId === job.id}
+            />
+          ))}
+        </section>
+      )}
     </main>
   );
 }

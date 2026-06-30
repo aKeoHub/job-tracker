@@ -1,6 +1,6 @@
 import { JOB_STATUSES } from "../constants/jobStatuses";
 
-function JobCard({ job, onStatusChange, onDelete }) {
+function JobCard({ job, onStatusChange, onDelete, isDeleting }) {
   return (
     <article className="job-card">
       <h2>{job.company}</h2>
@@ -20,8 +20,8 @@ function JobCard({ job, onStatusChange, onDelete }) {
           ))}
         </select>
       </label>
-      <button className="delete-button" onClick={() => onDelete(job.id)}>
-        Delete
+      <button type="button" className="delete-button" onClick={() => onDelete(job.id)} disabled={isDeleting}>
+        {isDeleting ? "Deleting..." : "Delete"}
       </button>
     </article>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { JOB_STATUSES } from "../constants/jobStatuses";
 
-function JobForm({ onCreateJob }) {
+function JobForm({ onCreateJob, isSaving }) {
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
   const [status, setStatus] = useState("saved");
@@ -53,7 +53,9 @@ function JobForm({ onCreateJob }) {
         </select>
       </label>
 
-      <button type="submit">Add job</button>
+      <button type="submit" disabled={isSaving}>
+        {isSaving ? "Saving..." : "Add job"}
+      </button>
     </form>
   );
 }

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -12,6 +13,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class JobCreate(BaseModel):
+    company: str
+    position: str
+    status: str
 
 jobs = [
     {
@@ -31,3 +37,13 @@ def read_root():
 @app.get("/jobs")
 def get_jobs():
     return jobs
+
+@app.post("/jobs", status_code=201)
+def create_job(job: JobCreate):
+    new_job = {
+        "id": len(jobs) + 1,
+        **job.model_dump(),
+    }
+
+    jobs.append(new_job)
+    return new_job

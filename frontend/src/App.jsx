@@ -10,6 +10,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingJobId, setDeletingJobId] = useState(null);
+  const [updatingJobIds, setUpdatingJobIds] = useState([]);
 
   useEffect(() => {
     async function loadJobs() {
@@ -61,6 +62,7 @@ function App() {
 
   async function handleStatusChange(jobId, status) {
     setError("");
+    setUpdatingJobIds((currentIds) => [...currentIds, jobId]);
 
     try {
       await updateJobStatus(jobId, status);
@@ -71,6 +73,8 @@ function App() {
       );
     } catch (error) {
       setError(error.message);
+    } finally {
+      setUpdatingJobIds((currentIds) => currentIds.filter((id) => id !== jobId));
     }
   }
 
@@ -92,6 +96,7 @@ function App() {
               onStatusChange={handleStatusChange}
               onDelete={handleDeleteJob}
               isDeleting={deletingJobId === job.id}
+              isUpdating={updatingJobIds.includes(job.id)}
             />
           ))}
         </section>

@@ -1,0 +1,30 @@
+import { JOB_STATUSES } from "../constants/jobStatuses";
+
+function JobCard({ job, onStatusChange, onDelete }) {
+  return (
+    <article className="job-card">
+      <h2>{job.company}</h2>
+      <p>
+        <span className="job-label">Position:</span> {job.position}
+      </p>
+      <label className="job-status">
+        <span className="job-label">Status:</span>
+        <select
+          value={job.status}
+          onChange={(event) => onStatusChange(job.id, event.target.value)}
+        >
+          {JOB_STATUSES.map((jobStatus) => (
+            <option key={jobStatus.value} value={jobStatus.value}>
+              {jobStatus.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button className="delete-button" onClick={() => onDelete(job.id)}>
+        Delete
+      </button>
+    </article>
+  );
+}
+
+export default JobCard;

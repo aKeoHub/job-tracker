@@ -1,24 +1,17 @@
 import { useEffect, useState } from "react";
-
-const API_URL = "http://127.0.0.1:8000";
+import "./App.css";
+import JobCard from "./components/JobCard";
+import JobForm from "./components/JobForm";
+import { createJob, getJobs, updateJobStatus, deleteJob } from "./services/jobsApi";
 
 function App() {
   const [jobs, setJobs] = useState([]);
-  const [company, setCompany] = useState("");
-  const [position, setPosition] = useState("");
-  const [status, setStatus] = useState("saved");
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadJobs() {
       try {
-        const response = await fetch(`${API_URL}/jobs`);
-
-        if (!response.ok) {
-          throw new Error("Could not load jobs");
-        }
-
-        setJobs(await response.json());
+        setJobs(await getJobs());
       } catch (error) {
         setError(error.message);
       }
@@ -27,33 +20,43 @@ function App() {
     loadJobs();
   }, []);
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  async function handleCreateJob(job) {
     setError("");
 
     try {
-      const response = await fetch(`${API_URL}/jobs`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          company,
-          position,
-          status,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Could not create job");
-      }
-
-      const newJob = await response.json();
+      const newJob = await createJob(job);
       setJobs((currentJobs) => [...currentJobs, newJob]);
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    }
+  }
 
-      setCompany("");
-      setPosition("");
-      setStatus("saved");
+  async function handleDeleteJob(jobId) {
+    const confirmed = window.confirm("Are you sure you want to delete this job?");
+    if (!confirmed) {
+      return;
+    }
+    setError("");
+    try {
+      await deleteJob(jobId);
+      setJobs((currentJobs) =>
+        currentJobs.filter((job) => job.id !== jobId));
+    } catch (error) {
+      setError(error.message);
+    }
+  }
+
+  async function handleStatusChange(jobId, status) {
+    setError("");
+
+    try {
+      await updateJobStatus(jobId, status);
+      setJobs((currentJobs) =>
+        currentJobs.map((job) =>
+          job.id === jobId ? { ...job, status } : job,
+        ),
+      );
     } catch (error) {
       setError(error.message);
     }
@@ -63,51 +66,17 @@ function App() {
     <main>
       <h1>Job Tracker</h1>
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          Company
-          <input
-            value={company}
-            onChange={(event) => setCompany(event.target.value)}
-            required
-          />
-        </label>
+      <JobForm onCreateJob={handleCreateJob} />
+      {error && <p className="error-message">{error}</p>}
 
-        <label>
-          Position
-          <input
-            value={position}
-            onChange={(event) => setPosition(event.target.value)}
-            required
-          />
-        </label>
-
-        <label>
-          Status
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-          >
-            <option value="saved">Saved</option>
-            <option value="applied">Applied</option>
-            <option value="interviewing">Interviewing</option>
-            <option value="offer">Offer</option>
-            <option value="rejected">Rejected</option>
-          </select>
-        </label>
-
-        <button type="submit">Add job</button>
-      </form>
-
-      {error && <p>{error}</p>}
-
-      <section>
+      <section className="job-list">
         {jobs.map((job) => (
-          <article key={job.id}>
-            <h2>{job.position}</h2>
-            <p>{job.company}</p>
-            <p>Status: {job.status}</p>
-          </article>
+          <JobCard
+            key={job.id}
+            job={job}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDeleteJob}
+          />
         ))}
       </section>
     </main>

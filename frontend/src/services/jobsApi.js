@@ -4,7 +4,14 @@ async function request(path, options) {
   const response = await fetch(`${API_URL}${path}`, options);
 
   if (!response.ok) {
-    throw new Error("The job request failed");
+    let message = `The request failed with status ${response.status}`;
+    try {
+      const data = await response.json();
+      message = data.detail || message;
+    } catch {
+      // Ignore JSON parsing errors
+    }
+    throw new Error(message);
   }
 
   return response.json();

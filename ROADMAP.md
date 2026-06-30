@@ -18,14 +18,14 @@ integrations, or AI features.
 
 The goal is a reliable personal tracker that handles the entire basic workflow.
 
-- [ ] Add a confirmation step before deleting a job
-- [ ] Add loading, saving, and deleting indicators
-- [ ] Disable controls while their request is running
-- [ ] Add an empty state when there are no jobs
-- [ ] Show clearer success and error messages
+- [x] Add a confirmation step before deleting a job
+- [x] Add loading, saving, and deleting indicators
+- [x] Disable controls while their request is running
+- [x] Add an empty state when there are no jobs
+- [x] Show clearer success and error messages
 - [ ] Allow editing company and position
 - [ ] Decide whether `Saved` belongs in the workflow
-- [ ] Validate job status when creating jobs, not only when updating them
+- [x] Validate job status when creating jobs, not only when updating them
 - [ ] Trim input and reject blank company or position values
 - [ ] Read the API URL from a Vite environment variable
 - [ ] Format and organize the backend imports and route spacing
@@ -94,10 +94,10 @@ Add fields gradually instead of creating one enormous form.
 
 ### Backend
 
-- [ ] Add pytest tests for every endpoint
-- [ ] Test successful and missing-record cases
-- [ ] Test invalid status and invalid input cases
-- [ ] Use a temporary test database
+- [x] Add pytest tests for every endpoint
+- [x] Test successful and missing-record cases
+- [x] Test invalid status and invalid input cases
+- [x] Use a temporary test database
 - [ ] Separate database access from route handlers
 - [ ] Add structured logging
 

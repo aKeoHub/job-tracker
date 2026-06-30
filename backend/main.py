@@ -1,12 +1,10 @@
 import sqlite3
 from pathlib import Path
+from typing import Literal
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Literal
-from fastapi import HTTPException
-
 
 app = FastAPI()
 
@@ -21,21 +19,18 @@ app.add_middleware(
 )
 
 DATABASE_PATH = Path(__file__).with_name("jobs.db")
+JobStatus = Literal["saved", "applied", "interviewing", "offer", "rejected"]
 
 
 class JobCreate(BaseModel):
     company: str
     position: str
-    status: str
+    status: JobStatus
+
 
 class JobStatusUpdate(BaseModel):
-    status: Literal[
-        "saved",
-        "applied",
-        "interviewing",
-        "offer",
-        "rejected",
-    ]
+    status: JobStatus
+
 
 def create_database():
     with sqlite3.connect(DATABASE_PATH) as connection:
@@ -64,6 +59,7 @@ def get_jobs():
 
     return [dict(row) for row in rows]
 
+
 @app.delete("/jobs/{job_id}")
 def delete_job(job_id: int):
     with sqlite3.connect(DATABASE_PATH) as connection:
@@ -76,6 +72,7 @@ def delete_job(job_id: int):
             raise HTTPException(status_code=404, detail="Job not found")
 
     return {"id": job_id, "deleted": True}
+
 
 @app.patch("/jobs/{job_id}")
 def update_job_status(job_id: int, job: JobStatusUpdate):

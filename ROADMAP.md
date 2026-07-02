@@ -104,10 +104,10 @@ Add fields gradually instead of creating one enormous form.
 ### Frontend
 
 - [ ] Add Vitest and React Testing Library
-- [ ] Test `JobForm` validation and submission
-- [ ] Test `JobCard` status changes and deletion
-- [ ] Test loading, empty, and error states
-- [ ] Mock API requests in component tests
+- [x] Test `JobForm` validation and submission
+- [x] Test `JobCard` status changes and deletion
+- [x] Test loading, empty, and error states
+- [x] Mock API requests in component tests
 - [ ] Add an end-to-end happy-path test with Playwright
 
 ### Automation

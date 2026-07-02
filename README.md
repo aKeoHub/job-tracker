@@ -15,3 +15,15 @@ Run the tests from the project root:
 ```bash
 pytest backend/tests
 ```
+
+## Frontend tests
+
+Install dependencies and run the tests from the frontend directory:
+
+```bash
+cd frontend
+npm install
+npm test
+```
+
+Use `npm run test:watch` to rerun tests automatically while editing.

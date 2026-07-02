@@ -14,7 +14,6 @@ function JobCard({ job, onStatusChange, onDelete, isDeleting, isUpdating }) {
           onChange={(event) => onStatusChange(job.id, event.target.value)}
           disabled={isUpdating || isDeleting}
         >
-
           {JOB_STATUSES.map((jobStatus) => (
             <option key={jobStatus.value} value={jobStatus.value}>
               {jobStatus.label}
@@ -23,7 +22,12 @@ function JobCard({ job, onStatusChange, onDelete, isDeleting, isUpdating }) {
         </select>
         {isUpdating && <span>Updating...</span>}
       </label>
-      <button type="button" className="delete-button" onClick={() => onDelete(job.id)} disabled={isDeleting || isUpdating}>
+      <button
+        type="button"
+        className="delete-button"
+        onClick={() => onDelete(job.id)}
+        disabled={isDeleting || isUpdating}
+      >
         {isDeleting ? "Deleting..." : "Delete"}
       </button>
     </article>

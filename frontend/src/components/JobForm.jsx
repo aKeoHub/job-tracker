@@ -26,6 +26,7 @@ function JobForm({ onCreateJob, isSaving }) {
         <input
           value={company}
           onChange={(event) => setCompany(event.target.value)}
+          disabled={isSaving}
           required
         />
       </label>
@@ -35,6 +36,7 @@ function JobForm({ onCreateJob, isSaving }) {
         <input
           value={position}
           onChange={(event) => setPosition(event.target.value)}
+          disabled={isSaving}
           required
         />
       </label>
@@ -44,6 +46,7 @@ function JobForm({ onCreateJob, isSaving }) {
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value)}
+          disabled={isSaving}
         >
           {JOB_STATUSES.map((jobStatus) => (
             <option key={jobStatus.value} value={jobStatus.value}>

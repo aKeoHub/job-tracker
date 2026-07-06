@@ -98,7 +98,7 @@ Add fields gradually instead of creating one enormous form.
 - [x] Test successful and missing-record cases
 - [x] Test invalid status and invalid input cases
 - [x] Use a temporary test database
-- [ ] Separate database access from route handlers
+- [x] Separate database access from route handlers
 - [ ] Add structured logging
 
 ### Frontend
@@ -123,7 +123,7 @@ Add fields gradually instead of creating one enormous form.
 Only introduce these when the application is large enough to benefit from them.
 
 - [ ] Split FastAPI routes, schemas, services, and database code into modules
-- [ ] Add a repository layer for database operations
+- [x] Add a repository layer for database operations
 - [ ] Replace manual schema changes with Alembic migrations
 - [ ] Move frontend server-state logic into a custom `useJobs` hook
 - [ ] Consider TanStack Query for caching, mutations, and request state

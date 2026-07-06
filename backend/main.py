@@ -1,10 +1,14 @@
-import sqlite3
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+try:
+    from backend.repositories import JobRepository
+except ModuleNotFoundError:
+    from repositories import JobRepository
 
 app = FastAPI()
 
@@ -31,77 +35,55 @@ class JobCreate(BaseModel):
 class JobStatusUpdate(BaseModel):
     status: JobStatus
 
+class JobDetailsUpdate(BaseModel):
+    company: str
+    position: str
+    
 
-def create_database():
-    with sqlite3.connect(DATABASE_PATH) as connection:
-        connection.execute(
-            """
-            CREATE TABLE IF NOT EXISTS jobs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                company TEXT NOT NULL,
-                position TEXT NOT NULL,
-                status TEXT NOT NULL
-            )
-            """
-        )
+
+def get_job_repository() -> JobRepository:
+    return JobRepository(DATABASE_PATH)
+
+
+def create_database() -> None:
+    get_job_repository().create_database()
 
 
 create_database()
 
 
 @app.get("/jobs")
-def get_jobs():
-    with sqlite3.connect(DATABASE_PATH) as connection:
-        connection.row_factory = sqlite3.Row
-        rows = connection.execute(
-            "SELECT id, company, position, status FROM jobs"
-        ).fetchall()
+def get_jobs(repo: JobRepository = Depends(get_job_repository)):
+    return repo.get_all()
 
-    return [dict(row) for row in rows]
+@app.put("/jobs/{job_id}")
+def update_job_details(job_id: int, job: JobDetailsUpdate, repo: JobRepository = Depends(get_job_repository)):
+    if not repo.update_details(job_id, job.company, job.position):
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    return {"id": job_id, "company": job.company, "position": job.position}
 
 
 @app.delete("/jobs/{job_id}")
-def delete_job(job_id: int):
-    with sqlite3.connect(DATABASE_PATH) as connection:
-        cursor = connection.execute(
-            "DELETE FROM jobs WHERE id = ?",
-            (job_id,),
-        )
-
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Job not found")
+def delete_job(job_id: int, repo: JobRepository = Depends(get_job_repository)):
+    if not repo.delete(job_id):
+        raise HTTPException(status_code=404, detail="Job not found")
 
     return {"id": job_id, "deleted": True}
 
 
 @app.patch("/jobs/{job_id}")
-def update_job_status(job_id: int, job: JobStatusUpdate):
-    with sqlite3.connect(DATABASE_PATH) as connection:
-        cursor = connection.execute(
-            "UPDATE jobs SET status = ? WHERE id = ?",
-            (job.status, job_id),
-        )
-
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Job not found")
+def update_job_status(job_id: int, job: JobStatusUpdate, repo: JobRepository = Depends(get_job_repository)):
+    if not repo.update_status(job_id, job.status):
+        raise HTTPException(status_code=404, detail="Job not found")
 
     return {"id": job_id, "status": job.status}
 
 
 @app.post("/jobs", status_code=201)
-def create_job(job: JobCreate):
-    with sqlite3.connect(DATABASE_PATH) as connection:
-        cursor = connection.execute(
-            """
-            INSERT INTO jobs (company, position, status)
-            VALUES (?, ?, ?)
-            """,
-            (job.company, job.position, job.status),
-        )
-
-        new_job = {
-            "id": cursor.lastrowid,
-            **job.model_dump(),
-        }
-
-    return new_job
+def create_job(job: JobCreate, repo: JobRepository = Depends(get_job_repository)):
+    return repo.create(
+        company=job.company,
+        position=job.position,
+        status=job.status,
+    )

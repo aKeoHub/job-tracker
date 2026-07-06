@@ -4,16 +4,26 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend import main
+from backend.repositories.job_repository import JobRepository
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
-    database_path = tmp_path / "test_jobs.db"
-    monkeypatch.setattr(main, "DATABASE_PATH", database_path)
-    main.create_database()
+def repository(tmp_path):
+    repository = JobRepository(tmp_path / "test_jobs.db")
+    repository.create_database()
+    return repository
+
+
+@pytest.fixture
+def client(repository):
+    main.app.dependency_overrides[main.get_job_repository] = (
+        lambda: repository
+    )
 
     with TestClient(main.app) as test_client:
         yield test_client
+
+    main.app.dependency_overrides.clear()
 
 
 def create_job(client, **overrides):
@@ -113,11 +123,11 @@ def test_delete_missing_job_returns_404(client):
     assert response.json() == {"detail": "Job not found"}
 
 
-def test_tests_use_an_isolated_database(client):
+def test_tests_use_an_isolated_database(client, repository):
     create_job(client)
 
-    with sqlite3.connect(main.DATABASE_PATH) as connection:
+    with sqlite3.connect(repository.database_path) as connection:
         count = connection.execute("SELECT COUNT(*) FROM jobs").fetchone()[0]
 
     assert count == 1
-    assert main.DATABASE_PATH.name == "test_jobs.db"
+    assert repository.database_path.name == "test_jobs.db"

@@ -63,3 +63,19 @@
 .error-message {
   color: #ff8f8f;
 }
+
+.job-edit-form {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.job-edit-form label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.job-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}

@@ -23,7 +23,7 @@ The goal is a reliable personal tracker that handles the entire basic workflow.
 - [x] Disable controls while their request is running
 - [x] Add an empty state when there are no jobs
 - [x] Show clearer success and error messages
-- [ ] Allow editing company and position
+- [x] Allow editing company and position
 - [ ] Decide whether `Saved` belongs in the workflow
 - [x] Validate job status when creating jobs, not only when updating them
 - [ ] Trim input and reject blank company or position values

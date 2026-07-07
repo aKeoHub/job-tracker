@@ -46,3 +46,13 @@ export function updateJobStatus(jobId, status) {
     body: JSON.stringify({ status }),
   });
 }
+
+export function updateJobDetails(jobId, details) {
+  return request(`/jobs/${jobId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(details),
+  });
+}

@@ -74,6 +74,40 @@ def test_create_job_rejects_invalid_status(client):
 
     assert response.status_code == 422
 
+def test_update_job_details(client):
+    job_id = create_job(client).json()["id"]
+
+    response = client.put(
+        f"/jobs/{job_id}",
+        json={"company": "New Company", "position": "Senior Developer"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+            "id": job_id,
+            "company": "New Company",
+            "position": "Senior Developer", 
+        }
+        
+def test_update_details_for_missing_job_returns_404(client):
+    response = client.put(
+        "/jobs/999",
+        json={"company": "New Company", "position": "Senior Developer"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Job not found"}
+
+def test_missing_required_fields_in_update_job_details_returns_422(client):
+    job_id = create_job(client).json()["id"]
+
+    response = client.put(
+        f"/jobs/{job_id}",
+        json={"company": "New Company"},
+    )
+
+    assert response.status_code == 422
+
 
 def test_update_job_status(client):
     job_id = create_job(client).json()["id"]
@@ -99,7 +133,14 @@ def test_update_job_rejects_invalid_status(client):
     assert response.status_code == 422
 
 
-def test_update_missing_job_returns_404(client):
+def test_update_status_for_missing_job_returns_404(client):
+    response = client.patch(
+        "/jobs/999",
+        json={"status": "applied"},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Job not found"}
     response = client.patch("/jobs/999", json={"status": "applied"})
 
     assert response.status_code == 404

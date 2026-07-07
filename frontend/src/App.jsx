@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import JobCard from "./components/JobCard";
 import JobForm from "./components/JobForm";
-import { createJob, getJobs, updateJobStatus, deleteJob } from "./services/jobsApi";
+import { createJob, getJobs, updateJobStatus, updateJobDetails, deleteJob } from "./services/jobsApi";
 
 function App() {
   const [jobs, setJobs] = useState([]);
@@ -103,6 +103,31 @@ function App() {
     }
   }
 
+  async function handleUpdateJobDetails(jobId, details) {
+    setMessage("");
+    setUpdatingJobIds((currentIds) => [...currentIds, jobId]);
+
+    try {
+      await updateJobDetails(jobId, details);
+      setJobs((currentJobs) =>
+        currentJobs.map((job) =>
+          job.id === jobId ? { ...job, ...details } : job,
+        ),
+      );
+      setMessage({
+        type: "success",
+        text: `Job details updated successfully.`,
+      });
+    } catch {
+      setMessage({
+        type: "error",
+        text: `Failed to update job details.`,
+      });
+    } finally {
+      setUpdatingJobIds((currentIds) => currentIds.filter((id) => id !== jobId));
+    }
+  }
+
   return (
     <main>
       <h1>Job Tracker</h1>
@@ -121,6 +146,7 @@ function App() {
               key={job.id}
               job={job}
               onStatusChange={handleStatusChange}
+              onUpdateDetails={handleUpdateJobDetails}
               onDelete={handleDeleteJob}
               isDeleting={deletingJobId === job.id}
               isUpdating={updatingJobIds.includes(job.id)}

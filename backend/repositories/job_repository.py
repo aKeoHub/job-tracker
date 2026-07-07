@@ -55,6 +55,15 @@ class JobRepository:
             )
 
         return cursor.rowcount > 0
+    
+    def update_details(self, job_id: int, company: str, position: str) -> bool:
+        with sqlite3.connect(self.database_path) as connection:
+            cursor = connection.execute(
+                "UPDATE jobs SET company = ?, position = ? WHERE id = ?",
+                (company, position, job_id),
+            )
+
+        return cursor.rowcount > 0
 
     def delete(self, job_id: int) -> bool:
         with sqlite3.connect(self.database_path) as connection:

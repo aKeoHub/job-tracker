@@ -43,12 +43,14 @@ export class App {
   protected readonly jobForm = this.formBuilder.nonNullable.group({
     company: ['', Validators.required],
     position: ['', Validators.required],
+    jobUrl: [''],
     status: this.formBuilder.nonNullable.control<JobStatus>('Saved', Validators.required),
   });
 
   protected readonly editForm = this.formBuilder.nonNullable.group({
     company: ['', Validators.required],
     position: ['', Validators.required],
+    jobUrl: [''],
   });
 
   constructor() {
@@ -70,7 +72,7 @@ export class App {
       next: (job) => {
         this.jobs.update((jobs) => [job, ...jobs]);
         this.notice.set({ type: 'success', text: `${job.position} at ${job.company} was added.` });
-        this.jobForm.reset({ company: '', position: '', status: 'Saved' });
+        this.jobForm.reset({ company: '', position: '', jobUrl: '', status: 'Saved' });
       },
       error: () => this.notice.set({ type: 'error', text: 'Failed to add job.' }),
     });
@@ -78,12 +80,12 @@ export class App {
 
   protected startEditing(job: Job): void {
     this.editingJobId.set(job.id);
-    this.editForm.setValue({ company: job.company, position: job.position });
+    this.editForm.setValue({ company: job.company, position: job.position, jobUrl: job.jobUrl ?? '' });
   }
 
   protected cancelEditing(): void {
     this.editingJobId.set(null);
-    this.editForm.reset({ company: '', position: '' });
+    this.editForm.reset({ company: '', position: '', jobUrl: '' });
   }
 
   protected saveDetails(jobId: number): void {

@@ -23,6 +23,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 .HasConversion<string>()
                 .HasMaxLength(32)
                 .IsRequired();
+
+            entity.Property(job => job.JobUrl)
+                .HasMaxLength(2048);
         });
     }
 }

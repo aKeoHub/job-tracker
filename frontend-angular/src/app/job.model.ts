@@ -5,6 +5,7 @@ export interface Job {
   company: string;
   position: string;
   status: JobStatus;
+  jobUrl: string | null;
   createdAt: string;
 }
 
@@ -12,11 +13,13 @@ export interface CreateJobRequest {
   company: string;
   position: string;
   status: JobStatus;
+  jobUrl: string | null;
 }
 
 export interface UpdateJobDetailsRequest {
   company: string;
   position: string;
+  jobUrl: string | null;
 }
 
 export interface JobStatusOption {

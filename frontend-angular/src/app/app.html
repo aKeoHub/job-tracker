@@ -25,10 +25,15 @@
     </label>
 
     <label>
+      <span>URL</span>
+      <input formControlName="jobUrl" type="url" autocomplete="url" />
+    </label>
+
+    <label>
       <span>Status</span>
       <select formControlName="status">
         @for (status of statusOptions; track status.value) {
-          <option [value]="status.value">{{ status.label }}</option>
+        <option [value]="status.value">{{ status.label }}</option>
         }
       </select>
     </label>
@@ -39,75 +44,84 @@
   </form>
 
   @if (notice(); as currentNotice) {
-    <p class="message" [class.error]="currentNotice.type === 'error'">
-      {{ currentNotice.text }}
-    </p>
+  <p class="message" [class.error]="currentNotice.type === 'error'">
+    {{ currentNotice.text }}
+  </p>
   }
 
   @if (isLoading()) {
-    <p class="state">Loading jobs from .NET API...</p>
+  <p class="state">Loading jobs from .NET API...</p>
   } @else if (jobs().length === 0) {
-    <p class="state">No jobs yet. Add your first job above.</p>
+  <p class="state">No jobs yet. Add your first job above.</p>
   } @else {
-    <section class="job-list" aria-label="Tracked jobs">
-      @for (job of jobs(); track job.id) {
-        <article class="job-card">
-          @if (editingJobId() === job.id) {
-            <form class="edit-form" [formGroup]="editForm" (ngSubmit)="saveDetails(job.id)">
-              <label>
-                <span>Company</span>
-                <input formControlName="company" />
-              </label>
+  <section class="job-list" aria-label="Tracked jobs">
+    @for (job of jobs(); track job.id) {
+    <article class="job-card">
+      @if (editingJobId() === job.id) {
+      <form class="edit-form" [formGroup]="editForm" (ngSubmit)="saveDetails(job.id)">
+        <label>
+          <span>Company</span>
+          <input formControlName="company" />
+        </label>
 
-              <label>
-                <span>Position</span>
-                <input formControlName="position" />
-              </label>
+        <label>
+          <span>Position</span>
+          <input formControlName="position" />
+        </label>
 
-              <div class="actions">
-                <button type="submit" [disabled]="isUpdating(job.id)">Save</button>
-                <button type="button" class="secondary" (click)="cancelEditing()">Cancel</button>
-              </div>
-            </form>
-          } @else {
-            <div class="job-heading">
-              <div>
-                <div class="title-row">
-                  <h2>{{ job.company }}</h2>
-                  <span class="status-badge">{{ job.status }}</span>
-                </div>
-                <p>{{ job.position }}</p>
-              </div>
+        <label>
+          <span>URL</span>
+          <input formControlName="jobUrl" type="url" autocomplete="url" />
+        </label>
 
-              <button type="button" class="secondary" (click)="startEditing(job)">Edit</button>
-            </div>
-          }
-
-          <div class="job-footer">
-            <label>
-              <span>Status</span>
-              <select
-                [value]="job.status"
-                [disabled]="isUpdating(job.id) || deletingJobId() === job.id"
-                (change)="updateStatus(job.id, $any($event.target).value)"
-              >
-                @for (status of statusOptions; track status.value) {
-                  <option [value]="status.value">{{ status.label }}</option>
-                }
-              </select>
-            </label>
-
-            <button
-              type="button"
-              class="danger"
-              [disabled]="deletingJobId() === job.id || isUpdating(job.id)"
-              (click)="deleteJob(job.id)"
-            >
-              {{ deletingJobId() === job.id ? 'Deleting...' : 'Delete' }}
-            </button>
+        <div class="actions">
+          <button type="submit" [disabled]="isUpdating(job.id)">Save</button>
+          <button type="button" class="secondary" (click)="cancelEditing()">Cancel</button>
+        </div>
+      </form>
+      } @else {
+      <div class="job-heading">
+        <div>
+          <div class="title-row">
+            <h2>{{ job.company }}</h2>
+            <span class="status-badge">{{ job.status }}</span>
           </div>
-        </article>
+          <p>{{ job.position }}</p>
+        </div>
+
+        <button type="button" class="secondary" (click)="startEditing(job)">Edit</button>
+      </div>
       }
-    </section>
+
+      @if (job.jobUrl) {
+      <a
+        class="job-link"
+        [href]="job.jobUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open job posting for {{ job.position }} at {{ job.company }}"
+      >
+        <span>View posting</span>
+      </a>
+      }
+
+      <div class="job-footer">
+        <label>
+          <span>Status</span>
+          <select [value]="job.status" [disabled]="isUpdating(job.id) || deletingJobId() === job.id"
+            (change)="updateStatus(job.id, $any($event.target).value)">
+            @for (status of statusOptions; track status.value) {
+            <option [value]="status.value">{{ status.label }}</option>
+            }
+          </select>
+        </label>
+        <button type="button" class="danger" [disabled]="deletingJobId() === job.id || isUpdating(job.id)"
+          (click)="deleteJob(job.id)">
+          {{ deletingJobId() === job.id ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    </article>
+    }
+  </section>
   }
 </main>

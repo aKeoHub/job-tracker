@@ -16,4 +16,5 @@ public sealed class Job
     public required string Position { get; set; }
     public JobStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? JobUrl { get; set; }
 }

@@ -21,7 +21,8 @@ public sealed class EfJobRepository(AppDbContext dbContext) : IJobRepository
             Company = request.Company.Trim(),
             Position = request.Position.Trim(),
             Status = request.Status,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            JobUrl = NormalizeJobUrl(request.JobUrl)
         };
 
         dbContext.Jobs.Add(job);
@@ -41,6 +42,7 @@ public sealed class EfJobRepository(AppDbContext dbContext) : IJobRepository
 
         job.Company = request.Company.Trim();
         job.Position = request.Position.Trim();
+        job.JobUrl = NormalizeJobUrl(request.JobUrl);
 
         await dbContext.SaveChangesAsync();
 
@@ -76,5 +78,10 @@ public sealed class EfJobRepository(AppDbContext dbContext) : IJobRepository
         await dbContext.SaveChangesAsync();
 
         return true;
+    }
+
+    private static string? NormalizeJobUrl(string? jobUrl)
+    {
+        return string.IsNullOrWhiteSpace(jobUrl) ? null : jobUrl.Trim();
     }
 }

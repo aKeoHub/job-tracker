@@ -1,0 +1,17 @@
+@backend_dotnet_HostAddress = http://localhost:5050
+
+GET {{backend_dotnet_HostAddress}}/api/jobs
+Accept: application/json
+
+###
+
+POST {{backend_dotnet_HostAddress}}/api/jobs
+Content-Type: application/json
+
+{
+  "company": "MNP",
+  "position": "Intermediate Full Stack Developer",
+  "status": "Interviewing"
+}
+
+###

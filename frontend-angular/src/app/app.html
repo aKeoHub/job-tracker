@@ -49,13 +49,37 @@
   </p>
   }
 
+  <section class="filters" aria-label="Filter jobs">
+    <label>
+      <span>Search</span>
+      <input
+        type="search"
+        placeholder="Company or position"
+        [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)"
+      />
+    </label>
+
+    <label>
+      <span>Status</span>
+      <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)">
+        <option value="All">All statuses</option>
+        @for (status of statusOptions; track status.value) {
+        <option [value]="status.value">{{ status.label }}</option>
+        }
+      </select>
+    </label>
+  </section>
+
   @if (isLoading()) {
   <p class="state">Loading jobs from .NET API...</p>
   } @else if (jobs().length === 0) {
   <p class="state">No jobs yet. Add your first job above.</p>
+  } @else if (filteredJobs().length === 0) {
+  <p class="state">No jobs match your filters.</p>
   } @else {
   <section class="job-list" aria-label="Tracked jobs">
-    @for (job of jobs(); track job.id) {
+    @for (job of filteredJobs(); track job.id) {
     <article class="job-card">
       @if (editingJobId() === job.id) {
       <form class="edit-form" [formGroup]="editForm" (ngSubmit)="saveDetails(job.id)">
@@ -94,13 +118,8 @@
       }
 
       @if (job.jobUrl) {
-      <a
-        class="job-link"
-        [href]="job.jobUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Open job posting for {{ job.position }} at {{ job.company }}"
-      >
+      <a class="job-link" [href]="job.jobUrl" target="_blank" rel="noopener noreferrer"
+        aria-label="Open job posting for {{ job.position }} at {{ job.company }}">
         <span>View posting</span>
       </a>
       }

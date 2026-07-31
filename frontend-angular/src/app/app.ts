@@ -28,6 +28,24 @@ export class App {
   protected readonly editingJobId = signal<number | null>(null);
   protected readonly deletingJobId = signal<number | null>(null);
   protected readonly updatingJobIds = signal<number[]>([]);
+  protected readonly searchTerm = signal('');
+  protected readonly statusFilter = signal<JobStatus | 'All'>('All');
+
+
+
+  protected readonly filteredJobs = computed(() => {
+    const searchTerm = this.searchTerm().trim().toLowerCase();
+    const statusFilter = this.statusFilter();
+    return this.jobs().filter((job) => {
+      const matchesSearch =
+        job.company.toLowerCase().includes(searchTerm) ||
+        job.position.toLowerCase().includes(searchTerm);
+
+      const matchesStatus = statusFilter === 'All' || job.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  });
 
   protected readonly totals = computed(() => {
     const jobs = this.jobs();

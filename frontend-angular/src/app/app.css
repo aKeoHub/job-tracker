@@ -175,6 +175,17 @@ h2 {
   padding: 18px;
 }
 
+.filters {
+  background: #ffffff;
+  border: 1px solid #d9e2e8;
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 220px;
+  margin: 20px 0 0;
+  padding: 18px;
+}
+
 .message,
 .state {
   border-radius: 8px;
@@ -281,6 +292,10 @@ h2 {
   }
 
   .job-form {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
     grid-template-columns: 1fr;
   }
 }
